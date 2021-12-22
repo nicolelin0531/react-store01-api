@@ -22,6 +22,10 @@ const isAuthenticated = ({ email, password }) => {
   );
 };
 
+const isExist = (email) => {
+  return getUsersDb().users.findIndex((user) => user.email === email) !== -1;
+};
+
 const SECRET = "12321JKJDKLJFKJFDFKJDJ239582935";
 const expiresIn = "1h";
 const createToken = (payload) => {
@@ -50,9 +54,9 @@ server.post("auth/register", (req, res) => {
   const { email, password, nickname, type } = req.body;
 
   //step 1 是否為存在用戶
-  if (isAuthenticated({ email, password })) {
+  if (isExist(email)) {
     const status = 401;
-    const message = "Email and Password already exist";
+    const message = "Email already exist";
     return res.status(status).json({ status, message });
   }
 
