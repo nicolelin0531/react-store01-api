@@ -95,6 +95,41 @@ server.post("auth/register", (req, res) => {
   res.status(200).json(jwToken);
 });
 
+server.use("/carts", (req, res, next) => {
+  if (
+    req.headers.authorization === undefined ||
+    req.headers.authorization.split(" ")[0] !== "Bearer" //沒拿到Bearer類型
+  ) {
+    const status = 401;
+    const message = "Error in authorization format";
+    res.status(status).json({ status, message });
+    return;
+  }
+  try {
+    const verifyTokenResult = verifyToken(
+      req.headers.authorization.split(" ")[1]
+    );
+    if (verifyTokenResult instanceof Error) {
+      const status = 401;
+      const message = "Access token not provided";
+      res.status(status).json({ status, message });
+      return;
+    }
+    next(); //繼續處理carts請求
+  } catch (error) {
+    const status = 401;
+    const message = "Error token is revoke";
+    return res.status(status).json({ status, message });
+  }
+});
+
+//Verify the token
+const verifyToken = (token) => {
+  return jwt.verify(token, SECRET, (err, decode) =>
+    decode != undefined ? decode : err
+  );
+};
+
 server.use(router);
 server.listen(3003, () => {
   console.log("JSON Server is running");
