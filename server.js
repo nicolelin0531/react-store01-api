@@ -46,6 +46,55 @@ server.post("/auth/login", (req, res) => {
   }
 });
 
+server.post("auth/register", (req, res) => {
+  const { email, password, nickname, type } = req.body;
+
+  //step 1 是否為存在用戶
+  if (isAuthenticated({ email, password })) {
+    const status = 401;
+    const message = "Email and Password already exist";
+    return res.status(status).json({ status, message });
+  }
+
+  //step 2 新的不存在用戶，寫到 user.json
+  fs.readFile(path.join(__dirname, "user.json"), (err, _data) => {
+    if (err) {
+      const status = 401;
+      const message = err;
+      return res.status(status).json({ status, message });
+    }
+    //Get current users data
+    const data = JSON.parse(_data.toString());
+    //Get the id of last user
+    const last_item_id = data.users[data.user.length - 1].id;
+    //Add new user
+    data.user.push({
+      id: last_item_id_item_id + 1,
+      email,
+      password,
+      nickname,
+      type,
+    });
+    fs.writeFile(
+      path.join(__dirname, "users.json"),
+      JSON.stringify(data),
+      (error, result) => {
+        //WRITE
+        if (err) {
+          const status = 401;
+          const message = err;
+          res.status(status).json({ status, message });
+          return;
+        }
+      }
+    );
+  });
+
+  //Create token for new user
+  const jwToken = createToken({ nickname, type, email });
+  res.status(200).json(jwToken);
+});
+
 server.use(router);
 server.listen(3003, () => {
   console.log("JSON Server is running");
