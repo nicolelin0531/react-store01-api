@@ -50,7 +50,7 @@ server.post("/auth/login", (req, res) => {
   }
 });
 
-server.post("auth/register", (req, res) => {
+server.post("/auth/register", (req, res) => {
   const { email, password, nickname, type } = req.body;
 
   //step 1 是否為存在用戶
@@ -70,9 +70,9 @@ server.post("auth/register", (req, res) => {
     //Get current users data
     const data = JSON.parse(_data.toString());
     //Get the id of last user
-    const last_item_id = data.users[data.user.length - 1].id;
+    const last_item_id = data.users[data.users.length - 1].id;
     //Add new user
-    data.user.push({
+    data.users.push({
       id: last_item_id_item_id + 1,
       email,
       password,
@@ -82,7 +82,7 @@ server.post("auth/register", (req, res) => {
     fs.writeFile(
       path.join(__dirname, "users.json"),
       JSON.stringify(data),
-      (error, result) => {
+      (err, result) => {
         //WRITE
         if (err) {
           const status = 401;
