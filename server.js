@@ -73,7 +73,7 @@ server.post("/auth/register", (req, res) => {
     const last_item_id = data.users[data.users.length - 1].id;
     //Add new user
     data.users.push({
-      id: last_item_id_item_id + 1,
+      id: last_item_id + 1,
       email,
       password,
       nickname,
